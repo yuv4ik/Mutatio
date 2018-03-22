@@ -1,5 +1,7 @@
 # Mutatio
-Visual Studio for Mac add-in/extension for converting old PCLs to .NET Standard 2.0 targeting projects automatically.
+Visual Studio for Mac add-in/extension for converting old PCLs to .NET Standard 2.0 targeting projects automatically.<br/><br/>
+<img src="https://github.com/yuv4ik/mutatio/raw/master/Screenshots/before.png">
+<img src="https://github.com/yuv4ik/mutatio/raw/master/Screenshots/after.png">
 
 ## Warning
 
