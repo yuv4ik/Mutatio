@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionModel>
+    <Extension path = "/MonoDevelop/Ide/Commands">
+         <Command id = "Mutatio.Commands.ConvertProjectToNetStandard"
+           _label = "Convert to NET Standard 2.0"
+           defaultHandler = "Mutatio.ConvertProjectToNetStandardHandler" />
+    </Extension>
+    <Extension path="/MonoDevelop/Ide/ContextMenu/ProjectPad">
+       <CommandItem id="Mutatio.Commands.ConvertProjectToNetStandard" disabledVisible="false" />
+   </Extension>
+</ExtensionModel>
