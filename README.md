@@ -15,11 +15,16 @@ Visual Studio for Mac add-in/extension for converting old PCLs to .NET Standard 
 4. Choose the `.mpack` file you downloaded in step 1
 5. When prompted, select Install
 
+## Limitations
+
+```Currently only C# projects supported.```<br/>
+Due to behavior differences `F#` support is currently postponed, however, contributors are welcome!
+
 ## Usage
 
 `Mutatio` can convert newly created or existing projects. Please keep in mind that there might be `NuGet` packages that does not support .NET Standard 2.0, in this case you may see `NuGet` related exceptions.
 
-In order to convert a project, right click on it and select `Convert to NET Standard 2.0`.
+In order to convert a project, right click on it and select `Convert to NET Standard 2.0`.<br/>For more details please check my [blog](https://smellyc0de.wordpress.com/2018/03/23/automatically-converting-pcl-to-net-standard-2-0-project/).
 
 ## Details
 

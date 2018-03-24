@@ -1,14 +1,15 @@
 ﻿using Mono.Addins;
 using Mono.Addins.Description;
+using Mutatio;
 
 [assembly: Addin(
     "Mutatio",
     Namespace = "Mutatio",
-    Version = "1.0"
+    Version = "1.0.1"
 )]
 
 [assembly: AddinName("Mutatio")]
 [assembly: AddinCategory("IDE extensions")]
-[assembly: AddinDescription("Converts PCL to .NET Standard 2.0 automatically.")]
+[assembly: AddinDescription("Automatically convert projects from PCL to .NET Standard 2.0.")]
 [assembly: AddinAuthor("Evgeny Zborovsky")]
-[assembly: AddinUrl("https://github.com/yuv4ik/mutatio")]
+[assembly: AddinUrl(Consts.ProjectUrl)]
