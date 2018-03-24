@@ -15,7 +15,13 @@ namespace Mutatio
 
         protected override void Update(CommandInfo info)
         {
-            info.Enabled = IsWorkspaceOpen() && ProjectIsNotBuildingOrRunning() && UserSelectedItemIsProject() && UserSelectedProjectIsNotNetStandard20();
+            info.Enabled =
+                IsWorkspaceOpen()
+                && ProjectIsNotBuildingOrRunning()
+                && UserSelectedItemIsProject()
+                && UserSelectedProjectIsPortableLibrary()
+                && UserSelectedProjectIsCSharpProject()
+                && UserSelectedProjectIsNotNetStandard20();
         }
 
         protected async override void Run()
@@ -28,12 +34,12 @@ namespace Mutatio
                 {
                     var proj = ProjectOperations.CurrentSelectedItem as DotNetProject;
 
-                    monitor.Log.WriteLine($"Converting {proj.Name}.csproj to NET Standard 2.0 format ..");
+                    monitor.Log.WriteLine($"Converting {proj.Name}{proj.GetProjFileExtension()} to NET Standard 2.0 format ..");
                     monitor.Log.WriteLine();
 
-                    var csProjFilePath = proj.GetCsProjFilePath();
+                    var projFilePath = proj.GetProjFilePath();
 
-                    monitor.Log.WriteLine($"Generating new .csproj");
+                    monitor.Log.WriteLine($"Generating new {proj.GetProjFileExtension()}");
                     monitor.Log.WriteLine();
 
                     var netStandardProjContent = new NetStandardProjFileGenerator(proj).GenerateProjForNetStandard();
@@ -48,11 +54,10 @@ namespace Mutatio
 
                     CleanUpOldFormatFiles(proj);
 
-                    // Create a new .csproj
-                    File.WriteAllText($"{csProjFilePath}", netStandardProjContent, Encoding.UTF8);
+                    // Create a new .xproj
+                    File.WriteAllText($"{projFilePath}", netStandardProjContent, Encoding.UTF8);
 
                     // TODO: Programmatically reload the project instead of re-opening.
-
                     monitor.Log.WriteLine($"Re-opening the project");
                     monitor.Log.WriteLine();
 
@@ -63,7 +68,7 @@ namespace Mutatio
                 }
                 catch (Exception ex)
                 {
-                    monitor.ReportError("Convertion failed. Please create an issue on github.", ex);
+                    monitor.ReportError($"Convertion failed. Please create an issue on github: {Consts.ProjectUrl}", ex);
                 }
                 finally
                 {
@@ -77,21 +82,23 @@ namespace Mutatio
             var backupFolderPath = $"{proj.BaseDirectory.FullPath.ParentDirectory}/mutatio_backup";
             // Create backup directory
             FileService.CreateDirectory(backupFolderPath);
-            // Backup current .csproj
-            var csProjFilePath = proj.GetCsProjFilePath();
-            FileService.CopyFile(csProjFilePath, $"{backupFolderPath}/{proj.Name}.csproj");
+            // Backup current .xproj
+            var projFilePath = proj.GetProjFilePath();
+            FileService.CopyFile(projFilePath, $"{backupFolderPath}/{proj.Name}.{proj.GetProjFileExtension()}");
             // Backup packages.config
             var packagesConfigFilePath = proj.GetPackagesFilePath();
             FileService.CopyFile(packagesConfigFilePath, $"{backupFolderPath}/packages.config");
-            // Backup /Properties dir
+
+            // Backup AssemblyInfo.x
             FileService.CopyDirectory(proj.GetPropertiesDirPath(), $"{backupFolderPath}/Properties");
         }
 
         void CleanUpOldFormatFiles(DotNetProject proj)
         {
             FileService.DeleteFile(proj.GetPackagesFilePath());
+            // TODO: In F# there is no /Properties
             FileService.DeleteDirectory(proj.GetPropertiesDirPath());
-            FileService.DeleteFile(proj.GetCsProjFilePath());
+            FileService.DeleteFile(proj.GetProjFilePath());
         }
 
         // Shoud be enabled only when the workspace is opened
@@ -107,6 +114,8 @@ namespace Mutatio
         }
 
         bool UserSelectedItemIsProject() => ProjectOperations.CurrentSelectedItem is DotNetProject;
-        bool UserSelectedProjectIsNotNetStandard20() => !(ProjectOperations.CurrentSelectedItem as DotNetProject).TargetFramework.Name.Equals(".NETStandard 2.0", System.StringComparison.OrdinalIgnoreCase);
+        bool UserSelectedProjectIsCSharpProject() => (ProjectOperations.CurrentSelectedItem as DotNetProject).IsCSharpProject();
+        bool UserSelectedProjectIsNotNetStandard20() => !(ProjectOperations.CurrentSelectedItem as DotNetProject).TargetFramework.Name.Equals(".NETStandard 2.0", StringComparison.OrdinalIgnoreCase);
+        bool UserSelectedProjectIsPortableLibrary() => (ProjectOperations.CurrentSelectedItem as DotNetProject).IsPortableLibrary;
     }
 }
