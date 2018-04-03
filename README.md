@@ -9,6 +9,14 @@ Visual Studio for Mac add-in/extension for converting old PCLs to .NET Standard 
 
 ## Installation
 
+### Automatic
+
+You can download and install Mutatio using the Extension Manager of Visual Studio for Mac by searching the Gallery.
+
+### Manual
+
+Alternatively you can download and install it manually using the folowing steps:
+
 1. Download the `.mpack` file from [here](https://github.com/yuv4ik/mutatio/tree/master/Versions)
 2. Launch Visual Studio, open the Visual Studio menu and select `Extensions...`
 3. In the bottom left of the Extensions Manager dialog, click `Install from file...`
