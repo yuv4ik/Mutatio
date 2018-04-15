@@ -5,8 +5,13 @@
   <ItemGroup>
     <PackageReference Include="MonoDevelop.Addins" Version="0.4.4" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Extensions\" />
+    <Folder Include="ProjectTemplates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Parsers\IParser.cs" />
   </ItemGroup>
 </Project>

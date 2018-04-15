@@ -1,7 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using MonoDevelop.Projects;
-using Mutatio.Extensions;
 
 namespace Mutatio
 {
@@ -17,18 +17,10 @@ namespace Mutatio
   </ItemGroup>
 
 </Project>";
-
-        readonly DotNetProject project;
-
-        public NetStandardProjFileGenerator(DotNetProject project)
+        
+        public string GenerateProjForNetStandard(Func<IEnumerable<(string name, string version)>> getPackages)
         {
-            this.project = project;
-        }
-
-        public string GenerateProjForNetStandard()
-        {
-            var packagesFileParser = new PackagesFileParser();
-            var packages = packagesFileParser.GetPackages(project.GetPackagesFilePath());
+            var packages = getPackages();
 
             var packagesText = new StringBuilder(packages.Count());
             foreach (var package in packages)
