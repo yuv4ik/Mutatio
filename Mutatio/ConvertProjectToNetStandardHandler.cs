@@ -31,27 +31,25 @@ namespace Mutatio
 
                 try
                 {
+                    // We don't want to miss any log messages after reloading the solution
+                    var logSummary = new StringBuilder();
                     var proj = ProjectOperations.CurrentSelectedItem as DotNetProject;
 
-                    monitor.Log.WriteLine($"Converting {proj.Name}{proj.GetProjFileExtension()} to NET Standard 2.0 format ..");
-                    monitor.Log.WriteLine();
+                    logSummary.AppendLine($"Converting {proj.Name}{proj.GetProjFileExtension()} to NET Standard 2.0 format ..");
 
                     var projFilePath = proj.GetProjFilePath();
 
-                    monitor.Log.WriteLine($"Generating new {proj.GetProjFileExtension()}");
-                    monitor.Log.WriteLine();
+                    logSummary.AppendLine($"Generating new {proj.GetProjFileExtension()}");
 
                     var projectTemplate = ProjectTemplateFactory.GetTemplate(proj);
-                    monitor.Log.WriteLine($"Project template detected: {projectTemplate}");
+                    logSummary.AppendLine($"Project template detected: {projectTemplate}");
                     var netStandardProjContent = new NetStandardProjFileGenerator().GenerateProjForNetStandard(projectTemplate.GetPackages);
 
-                    monitor.Log.WriteLine($"Creating backup");
-                    monitor.Log.WriteLine();
+                    logSummary.AppendLine("Creating backup");
 
                     projectTemplate.BackupOldFormatFiles();
 
-                    monitor.Log.WriteLine($"Deleting old files");
-                    monitor.Log.WriteLine();
+                    logSummary.AppendLine("Deleting old files");
 
                     projectTemplate.CleanUpOldFormatFiles();
 
@@ -59,11 +57,12 @@ namespace Mutatio
                     File.WriteAllText($"{projFilePath}", netStandardProjContent, Encoding.UTF8);
 
                     // TODO: Programmatically reload the project instead of re-opening.
-                    monitor.Log.WriteLine($"Re-opening the project");
-                    monitor.Log.WriteLine();
+                    logSummary.AppendLine("Re-opening the project");
 
                     await IdeApp.Workspace.Close(true);
                     await IdeApp.Workspace.OpenWorkspaceItem(proj.ParentSolution.FileName);
+
+                    monitor.Log.WriteLine(logSummary);
 
                     monitor.Log.WriteLine("Please note that .NET Standard 2.0 is supported only from Xamarin.Forms 2.4+.");
                     monitor.Log.WriteLine("More information can be found here: https://docs.microsoft.com/en-us/xamarin/xamarin-forms/internals/net-standard");
