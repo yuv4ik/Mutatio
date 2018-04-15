@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using MonoDevelop.Components.Commands;
-using MonoDevelop.Core;
 using MonoDevelop.Ide;
 using MonoDevelop.Projects;
 using Mutatio.Extensions;
@@ -42,17 +41,19 @@ namespace Mutatio
                     monitor.Log.WriteLine($"Generating new {proj.GetProjFileExtension()}");
                     monitor.Log.WriteLine();
 
-                    var netStandardProjContent = new NetStandardProjFileGenerator(proj).GenerateProjForNetStandard();
+                    var projectTemplate = ProjectTemplateFactory.GetTemplate(proj);
+                    monitor.Log.WriteLine($"Project template detected: {projectTemplate}");
+                    var netStandardProjContent = new NetStandardProjFileGenerator().GenerateProjForNetStandard(projectTemplate.GetPackages);
 
                     monitor.Log.WriteLine($"Creating backup");
                     monitor.Log.WriteLine();
 
-                    BackupOldFormatFiles(proj);
+                    projectTemplate.BackupOldFormatFiles();
 
                     monitor.Log.WriteLine($"Deleting old files");
                     monitor.Log.WriteLine();
 
-                    CleanUpOldFormatFiles(proj);
+                    projectTemplate.CleanUpOldFormatFiles();
 
                     // Create a new .xproj
                     File.WriteAllText($"{projFilePath}", netStandardProjContent, Encoding.UTF8);
@@ -64,6 +65,8 @@ namespace Mutatio
                     await IdeApp.Workspace.Close(true);
                     await IdeApp.Workspace.OpenWorkspaceItem(proj.ParentSolution.FileName);
 
+                    monitor.Log.WriteLine("Please note that .NET Standard 2.0 is supported only from Xamarin.Forms 2.4+.");
+                    monitor.Log.WriteLine("More information can be found here: https://docs.microsoft.com/en-us/xamarin/xamarin-forms/internals/net-standard");
                     monitor.ReportSuccess("Convertion succeed.");
                 }
                 catch (Exception ex)
@@ -75,30 +78,6 @@ namespace Mutatio
                     monitor.EndTask();
                 }
             }
-        }
-
-        void BackupOldFormatFiles(DotNetProject proj)
-        {
-            var backupFolderPath = $"{proj.BaseDirectory.FullPath.ParentDirectory}/mutatio_backup";
-            // Create backup directory
-            FileService.CreateDirectory(backupFolderPath);
-            // Backup current .xproj
-            var projFilePath = proj.GetProjFilePath();
-            FileService.CopyFile(projFilePath, $"{backupFolderPath}/{proj.Name}.{proj.GetProjFileExtension()}");
-            // Backup packages.config
-            var packagesConfigFilePath = proj.GetPackagesFilePath();
-            FileService.CopyFile(packagesConfigFilePath, $"{backupFolderPath}/packages.config");
-
-            // Backup AssemblyInfo.x
-            FileService.CopyDirectory(proj.GetPropertiesDirPath(), $"{backupFolderPath}/Properties");
-        }
-
-        void CleanUpOldFormatFiles(DotNetProject proj)
-        {
-            FileService.DeleteFile(proj.GetPackagesFilePath());
-            // TODO: In F# there is no /Properties
-            FileService.DeleteDirectory(proj.GetPropertiesDirPath());
-            FileService.DeleteFile(proj.GetProjFilePath());
         }
 
         // Shoud be enabled only when the workspace is opened

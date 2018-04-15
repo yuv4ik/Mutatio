@@ -1,11 +1,12 @@
 ﻿using System;
+using System.IO;
 using MonoDevelop.Projects;
 
 namespace Mutatio.Extensions
 {
     public static class DotNetProjectExtenions
     {
-        public static string GetPackagesFilePath(this DotNetProject proj) => $"{proj.BaseDirectory.FullPath}/packages.config";
+        public static string GetPackagesJsonFilePath(this DotNetProject proj) => $"{proj.BaseDirectory.FullPath}/packages.config";
         public static string GetPropertiesDirPath(this DotNetProject proj) => $"{proj.BaseDirectory.FullPath}/Properties";
 
         public static string GetProjFilePath(this DotNetProject proj) => proj.FileName.FullPath;
@@ -27,5 +28,9 @@ namespace Mutatio.Extensions
         }
 
         public static bool IsCSharpProject(this DotNetProject proj) => proj.LanguageName.Equals("c#", StringComparison.OrdinalIgnoreCase);
+
+        public static string GetProjectJsonFilePath(this DotNetProject proj) => $"{proj.BaseDirectory.FullPath}/project.json";
+        public static string GetProjectLockJsonFilePath(this DotNetProject proj) => $"{proj.BaseDirectory.FullPath}/project.lock.json";
+        public static bool ContainsProjectJson(this DotNetProject proj) => File.Exists(GetProjectJsonFilePath(proj));
     }
 }
