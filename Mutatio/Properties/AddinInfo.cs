@@ -5,7 +5,7 @@ using Mutatio;
 [assembly: Addin(
     "Mutatio",
     Namespace = "Mutatio",
-    Version = "1.0.1"
+    Version = "1.0.2"
 )]
 
 [assembly: AddinName("Mutatio")]
